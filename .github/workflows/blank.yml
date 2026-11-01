@@ -1,0 +1,140 @@
+import tkinter as tk
+from tkinter import ttk, scrolledtext
+import datetime
+import random
+
+class ProfessionalVirtualPC:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("CloudNode Virtual Workspace - Enterprise Edition")
+        self.root.geometry("850x600")
+        self.root.config(bg="#0f172a") # Fondo oscuro profesional
+        self.root.minsize(800, 550)
+
+        # Configuración de estilos ttk para las barras de progreso
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        
+        # Paleta de colores
+        self.bg_color = "#0f172a"
+        self.card_bg = "#1e293b"
+        self.accent_color = "#38bdf8"
+        self.text_color = "#f8fafc"
+        self.muted_text = "#94a3b8"
+
+        self.create_widgets()
+        self.log_message("Sistema Virtual inicializado correctamente.")
+        self.log_message("Conectado al nodo clúster: us-east-rtx3060-01")
+
+    def create_widgets(self):
+        # Encabezado Superior
+        header_frame = tk.Frame(self.root, bg=self.card_bg, height=60)
+        header_frame.pack(fill="x", padx=15, pady=15)
+        header_frame.pack_propagate(False)
+
+        title_lbl = tk.Label(header_frame, text="⚡ VIRTUAL MACHINE DASHBOARD", font=("Segoe UI", 13, "bold"), fg=self.accent_color, bg=self.card_bg)
+        title_lbl.pack(side="left", padx=20)
+
+        self.status_indicator = tk.Label(header_frame, text="● EN LÍNEA", font=("Segoe UI", 10, "bold"), fg="#22c55e", bg=self.card_bg)
+        self.status_indicator.pack(side="right", padx=20)
+
+        # Contenedor Principal (Grid)
+        main_container = tk.Frame(self.root, bg=self.bg_color)
+        main_container.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        main_container.columnconfigure(0, weight=1)
+        main_container.columnconfigure(1, weight=1)
+        main_container.rowconfigure(0, weight=1)
+        main_container.rowconfigure(1, weight=1)
+
+        # 1. Panel de Especificaciones de Hardware
+        specs_frame = tk.LabelFrame(main_container, text=" Especificaciones del Nodo ", font=("Segoe UI", 10, "bold"), fg=self.text_color, bg=self.card_bg, bd=1, relief="solid")
+        specs_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+        
+        specs = [
+            ("Procesador:", "AMD Ryzen 7 5800X (8C/16T)"),
+            ("Memoria RAM:", "32.0 GB DDR4 ECC (3200MHz)"),
+            ("Almacenamiento:", "1.0 TB NVMe Gen4 SSD"),
+            ("Tarjeta Gráfica:", "NVIDIA RTX 3060 (12GB VRAM)"),
+            ("Sistema Operativo:", "Ubuntu 24.04 LTS / VirtualOS"),
+            ("Dirección IP:", "192.168.1.144 (Bridged)")
+        ]
+
+        for i, (k, v) in enumerate(specs):
+            tk.Label(specs_frame, text=k, font=("Segoe UI", 9, "bold"), fg=self.muted_text, bg=self.card_bg, anchor="w").grid(row=i, column=0, sticky="w", padx=15, pady=4)
+            tk.Label(specs_frame, text=v, font=("Segoe UI", 9), fg=self.text_color, bg=self.card_bg, anchor="w").grid(row=i, column=1, sticky="w", padx=15, pady=4)
+
+        # 2. Panel de Monitoreo de Recursos en Vivo
+        monitor_frame = tk.LabelFrame(main_container, text=" Monitoreo de Rendimiento ", font=("Segoe UI", 10, "bold"), fg=self.text_color, bg=self.card_bg, bd=1, relief="solid")
+        monitor_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
+
+        self.style.configure("Custom.Horizontal.TProgressbar", background=self.accent_color, troughcolor="#334155", bordercolor=self.card_bg)
+
+        # Barra RAM
+        tk.Label(monitor_frame, text="Uso de RAM (8.4 GB / 32 GB)", font=("Segoe UI", 9, "bold"), fg=self.text_color, bg=self.card_bg).pack(anchor="w", padx=15, pady=(15, 2))
+        self.ram_bar = ttk.Progressbar(monitor_frame, style="Custom.Horizontal.TProgressbar", length=300, mode="determinate", value=26)
+        self.ram_bar.pack(padx=15, pady=(0, 10), fill="x")
+
+        # Barra Almacenamiento
+        tk.Label(monitor_frame, text="Uso de Almacenamiento (240 GB / 1.0 TB)", font=("Segoe UI", 9, "bold"), fg=self.text_color, bg=self.card_bg).pack(anchor="w", padx=15, pady=(5, 2))
+        self.storage_bar = ttk.Progressbar(monitor_frame, style="Custom.Horizontal.TProgressbar", length=300, mode="determinate", value=24)
+        self.storage_bar.pack(padx=15, pady=(0, 10), fill="x")
+
+        # Barra GPU
+        tk.Label(monitor_frame, text="Carga de RTX 3060 (Temperatura: 42°C)", font=("Segoe UI", 9, "bold"), fg=self.text_color, bg=self.card_bg).pack(anchor="w", padx=15, pady=(5, 2))
+        self.gpu_bar = ttk.Progressbar(monitor_frame, style="Custom.Horizontal.TProgressbar", length=300, mode="determinate", value=18)
+        self.gpu_bar.pack(padx=15, pady=(0, 15), fill="x")
+
+        # 3. Panel de Consola / Registro de Eventos
+        terminal_frame = tk.LabelFrame(main_container, text=" Registro de Sistema (Logs) ", font=("Segoe UI", 10, "bold"), fg=self.text_color, bg=self.card_bg, bd=1, relief="solid")
+        terminal_frame.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+
+        self.console = scrolledtext.ScrolledText(terminal_frame, wrap=tk.WORD, height=7, bg="#090d16", fg="#38bdf8", font=("Consolas", 9), insertbackground="white", bd=0)
+        self.console.pack(fill="both", expand=True, padx=10, pady=10)
+        self.console.config(state=tk.DISABLED)
+
+        # Barra de Botones Inferior
+        btn_frame = tk.Frame(self.root, bg=self.bg_color)
+        btn_frame.pack(fill="x", padx=15, pady=(0, 15))
+
+        refresh_btn = tk.Button(btn_frame, text="🔄 Actualizar Métricas", bg="#0284c7", fg="white", font=("Segoe UI", 9, "bold"), bd=0, padx=15, pady=8, cursor="hand2", command=self.refresh_metrics)
+        refresh_btn.pack(side="left", padx=5)
+
+        reboot_btn = tk.Button(btn_frame, text="⚡ Reiniciar Nodo", bg="#b91c1c", fg="white", font=("Segoe UI", 9, "bold"), bd=0, padx=15, pady=8, cursor="hand2", command=self.reboot_system)
+        reboot_btn.pack(side="left", padx=5)
+
+        exit_btn = tk.Button(btn_frame, text="Salir", bg="#334155", fg="white", font=("Segoe UI", 9, "bold"), bd=0, padx=15, pady=8, cursor="hand2", command=self.root.quit)
+        exit_btn.pack(side="right", padx=5)
+
+    def log_message(self, message):
+        timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+        self.console.config(state=tk.NORMAL)
+        self.console.insert(tk.END, f"[{timestamp}] {message}\n")
+        self.console.see(tk.END)
+        self.console.config(state=tk.DISABLED)
+
+    def refresh_metrics(self):
+        new_ram = random.randint(25, 35)
+        new_storage = 24
+        new_gpu = random.randint(15, 45)
+        
+        self.ram_bar['value'] = new_ram
+        self.storage_bar['value'] = new_storage
+        self.gpu_bar['value'] = new_gpu
+        
+        self.log_message(f"Métricas actualizadas. Uso de RAM: {new_ram}% | Carga GPU: {new_gpu}%")
+
+    def reboot_system(self):
+        self.log_message("¡ADVERTENCIA! Comando de reinicio remoto recibido...")
+        self.status_indicator.config(text="● REINICIANDO", fg="#eab308")
+        self.root.update()
+        self.root.after(1500, self.complete_reboot)
+
+    def complete_reboot(self):
+        self.status_indicator.config(text="● EN LÍNEA", fg="#22c55e")
+        self.log_message("Nodo reiniciado con éxito. Servicios seguros activos.")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ProfessionalVirtualPC(root)
+    root.mainloop()
+    

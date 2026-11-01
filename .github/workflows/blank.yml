@@ -32,7 +32,7 @@ class ProfessionalVirtualPC:
         header_frame.pack(fill="x", padx=15, pady=15)
         header_frame.pack_propagate(False)
 
-        title_lbl = tk.Label(header_frame, text="⚡ VIRTUAL MACHINE DASHBOARD", font=("Segoe UI", 13, "bold"), fg=self.accent_color, bg=self.card_bg)
+        title_lbl = tk.Label(header_frame, text=" VIRTUAL MACHINE DASHBOARD", font=("Segoe UI", 13, "bold"), fg=self.accent_color, bg=self.card_bg)
         title_lbl.pack(side="left", padx=20)
 
         self.status_indicator = tk.Label(header_frame, text="● EN LÍNEA", font=("Segoe UI", 10, "bold"), fg="#22c55e", bg=self.card_bg)
